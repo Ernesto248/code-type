@@ -6,18 +6,16 @@ import { markLessonComplete, getCompletedCount, loadProgress } from '../stores/p
 export function App() {
   const app = document.querySelector('#app')
   app.innerHTML = ''
-  app.className = 'min-h-screen flex flex-col'
+  app.className = 'h-screen flex flex-col overflow-hidden'
 
   let currentLessonIndex = 0
 
-  // ─── Layout ───
-
   const html = `
-    <!-- Particle background -->
+    <!-- Floating particles -->
     <div id="particles" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-    <!-- Nav -->
-    <nav class="relative z-10 border-b border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md">
+    <!-- Nav — always visible -->
+    <nav class="relative z-10 shrink-0 border-b border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md">
       <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="text-2xl">⌨️</span>
@@ -35,22 +33,22 @@ export function App() {
       </div>
     </nav>
 
-    <!-- Main content -->
-    <main class="relative z-10 flex-1 flex max-w-7xl mx-auto w-full p-6 gap-6 min-h-0">
-      <!-- Theory panel (left) -->
+    <!-- Main content — fills remaining space, both panels scroll independently -->
+    <main class="relative z-10 flex-1 flex max-w-7xl mx-auto w-full p-6 gap-6 min-h-0 overflow-hidden">
+      <!-- Theory panel (left) — scrolls independently -->
       <section id="theory-panel" class="w-[45%] min-w-0 overflow-y-auto bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in">
       </section>
 
-      <!-- Divider -->
-      <div class="w-px bg-gradient-to-b from-transparent via-[#2a2a3e] to-transparent"></div>
+      <!-- Vertical divider -->
+      <div class="w-px shrink-0 bg-gradient-to-b from-transparent via-[#2a2a3e] to-transparent"></div>
 
-      <!-- Code typing panel (right) -->
-      <section id="code-panel" class="flex-1 min-w-0 relative bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in" style="animation-delay: 0.1s">
+      <!-- Code panel (right) — scrolls independently -->
+      <section id="code-panel" class="flex-1 min-w-0 relative bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in overflow-hidden" style="animation-delay: 0.1s">
       </section>
     </main>
 
-    <!-- Lesson selector -->
-    <div id="lesson-selector" class="relative z-10 border-t border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md">
+    <!-- Lesson selector — always visible at bottom -->
+    <div id="lesson-selector" class="relative z-10 shrink-0 border-t border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md">
       <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-2 overflow-x-auto">
         ${lessons.map((l, i) => `
           <button class="lesson-dot px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer whitespace-nowrap
@@ -66,15 +64,15 @@ export function App() {
 
   app.innerHTML = html
 
-  // ─── Particles ───
   createParticles()
 
-  // ─── Load first lesson ───
+  // ─── Lesson loader ───
+
   function loadLesson(index) {
     currentLessonIndex = index
     const lesson = lessons[index]
 
-    // Update active dot
+    // Update dots
     document.querySelectorAll('.lesson-dot').forEach((dot, i) => {
       if (i === index) {
         dot.className = 'lesson-dot px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer whitespace-nowrap bg-[#6c63ff]/20 border-[#6c63ff]/50 text-[#6c63ff]'
@@ -83,19 +81,19 @@ export function App() {
       }
     })
 
-    // Update module badge
+    // Module badge
     const badge = document.querySelector('#module-badge')
     if (badge) badge.textContent = lesson.module
 
-    // Render theory
+    // Theory panel
     const theoryPanel = document.querySelector('#theory-panel')
     theoryPanel.innerHTML = ''
     theoryPanel.classList.remove('slide-in')
-    void theoryPanel.offsetWidth // reflow
+    void theoryPanel.offsetWidth
     theoryPanel.classList.add('slide-in')
     theoryPanel.appendChild(TheoryPanel(lesson))
 
-    // Render code
+    // Code panel
     const codePanel = document.querySelector('#code-panel')
     codePanel.innerHTML = ''
     codePanel.classList.remove('slide-in')
@@ -111,24 +109,17 @@ export function App() {
         })
         updateProgress()
       },
-      onProgress(engine) {
-        // Real-time updates if needed
-      }
     })
 
     codePanel.appendChild(typist)
 
-    // Listen for next lesson from completion overlay
-    typist.addEventListener('next-lesson', () => {
-      goNext()
-    })
+    typist.addEventListener('next-lesson', () => goNext())
   }
 
   function goNext() {
     const next = getNextLesson(lessons[currentLessonIndex].id)
     if (next) {
-      const nextIdx = lessons.indexOf(next)
-      loadLesson(nextIdx)
+      loadLesson(lessons.indexOf(next))
     }
   }
 
@@ -137,21 +128,19 @@ export function App() {
     if (count) count.textContent = `${getCompletedCount()}/${lessons.length}`
   }
 
-  // ─── Lesson dots navigation ───
+  // ─── Dot click navigation ───
+
   document.querySelectorAll('.lesson-dot').forEach(dot => {
     dot.addEventListener('click', () => {
       const idx = parseInt(dot.dataset.index)
-      if (idx !== currentLessonIndex) {
-        loadLesson(idx)
-      }
+      if (idx !== currentLessonIndex) loadLesson(idx)
     })
   })
 
-  // Load first lesson
   loadLesson(0)
 }
 
-// ─── Background particles ───
+// ─── Particles ───
 
 function createParticles() {
   const container = document.querySelector('#particles')
@@ -159,19 +148,17 @@ function createParticles() {
 
   const colors = ['#6c63ff', '#4ade80', '#f87171', '#60a5fa', '#fbbf24']
   for (let i = 0; i < 30; i++) {
-    const particle = document.createElement('div')
+    const p = document.createElement('div')
     const size = Math.random() * 4 + 2
-    const color = colors[Math.floor(Math.random() * colors.length)]
-    particle.className = 'floating-particle'
-    particle.style.cssText = `
-      width: ${size}px;
-      height: ${size}px;
-      background: ${color};
+    p.className = 'floating-particle'
+    p.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      background: ${colors[i % colors.length]};
       left: ${Math.random() * 100}%;
       animation-duration: ${Math.random() * 20 + 15}s;
       animation-delay: ${Math.random() * -20}s;
       opacity: ${Math.random() * 0.1 + 0.05};
     `
-    container.appendChild(particle)
+    container.appendChild(p)
   }
 }
