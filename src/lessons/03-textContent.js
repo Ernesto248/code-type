@@ -1,10 +1,10 @@
 export default {
   id: '03-textContent',
-  title: 'Leyendo y modificando texto con textContent',
+  title: 'Leyendo y escribiendo texto',
   module: 'DOM Manipulation',
   theory: `## textContent
 
-La propiedad \`textContent\` te permite **leer o modificar** el contenido de texto de un elemento.
+\`textContent\` te permite **leer o modificar** el texto de un elemento.
 
 ### Leer texto
 
@@ -12,31 +12,35 @@ La propiedad \`textContent\` te permite **leer o modificar** el contenido de tex
 const texto = elemento.textContent;
 ~~~
 
-### Modificar texto
+### Escribir texto
 
 ~~~js
-elemento.textContent = "Nuevo texto";
+elemento.textContent = "Nuevo contenido";
 ~~~
 
 ### textContent vs innerText
 
-- \`textContent\`: devuelve **todo** el texto, incluyendo texto oculto. Es más rápido.
-- \`innerText\`: solo texto visible, respeta estilos CSS. Es más lento.
+- **textContent**: devuelve **todo** el texto (incluye oculto). Más rápido.
+- **innerText**: solo texto visible. Más lento.
 
-### Ejemplo práctico
+### Template strings
+
+Puedes interpolar valores con template literals:
 
 ~~~js
-const titulo = document.querySelector("#title");
-titulo.textContent = "Bienvenido, usuario!";
-
-console.log(titulo.textContent); // "Bienvenido, usuario!"
+elemento.textContent = \`Total: \${count} elementos\`;
 ~~~
 `,
-  snippet: `const titulo = document.querySelector("h1");
-// Cambia el texto del título a "Hola Mundo"
-████████████████████████████████████;`,
-  answer: `titulo.textContent = "Hola Mundo"`,
-  hint: 'Asigna "Hola Mundo" a titulo.textContent',
-  preview: '<h1>Hola Mundo</h1>',
-  difficulty: 'easy',
+  snippet: `// Cuenta los items y muestra el resultado
+const lista = document.querySelector("#lista");
+const items = lista.querySelectorAll("li");
+const total = items.length;
+
+// Tu turno: actualiza el texto del contador
+████████████████████████████████████████████████████████████████████████`,
+  answer: `document.querySelector("#contador").textContent = \`Total: \${total} elementos\``,
+  hint: 'Usa template string con textContent',
+  preview: '<span id="contador">Total: 5 elementos</span>',
+  difficulty: 'medium',
+  intro: 'Aprenderás a **leer y modificar texto** en el DOM con textContent. También verás cómo usar **template strings** para interpolar valores dinámicamente.',
 }

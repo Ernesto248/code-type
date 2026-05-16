@@ -1,6 +1,7 @@
 import { lessons, getNextLesson } from '../lessons/index.js'
 import { TheoryPanel } from './TheoryPanel.js'
 import { CodeTypist } from './CodeTypist.js'
+import { LessonIntro } from './LessonIntro.js'
 import { markLessonComplete, getCompletedCount, loadProgress } from '../stores/progress.js'
 
 export function App() {
@@ -68,7 +69,7 @@ export function App() {
 
   // ─── Lesson loader ───
 
-  function loadLesson(index) {
+  function renderLesson(index) {
     currentLessonIndex = index
     const lesson = lessons[index]
 
@@ -112,14 +113,19 @@ export function App() {
     })
 
     codePanel.appendChild(typist)
-
     typist.addEventListener('next-lesson', () => goNext())
+  }
+
+  function showLesson(index) {
+    const lesson = lessons[index]
+    LessonIntro(lesson, () => renderLesson(index))
   }
 
   function goNext() {
     const next = getNextLesson(lessons[currentLessonIndex].id)
     if (next) {
-      loadLesson(lessons.indexOf(next))
+      const nextIdx = lessons.indexOf(next)
+      showLesson(nextIdx)
     }
   }
 
@@ -133,11 +139,12 @@ export function App() {
   document.querySelectorAll('.lesson-dot').forEach(dot => {
     dot.addEventListener('click', () => {
       const idx = parseInt(dot.dataset.index)
-      if (idx !== currentLessonIndex) loadLesson(idx)
+      if (idx !== currentLessonIndex) showLesson(idx)
     })
   })
 
-  loadLesson(0)
+  // Start with lesson 0 intro
+  showLesson(0)
 }
 
 // ─── Particles ───

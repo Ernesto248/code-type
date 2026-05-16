@@ -4,7 +4,7 @@ export default {
   module: 'DOM Manipulation',
   theory: `## createElement
 
-\`document.createElement()\` crea un nuevo elemento HTML en memoria. No aparece en la página hasta que lo agregas al DOM con \`appendChild\` o \`append\`.
+\`document.createElement()\` crea un nuevo elemento HTML en memoria. No aparece hasta que lo agregas al DOM.
 
 ### Sintaxis
 
@@ -15,37 +15,33 @@ const elemento = document.createElement("etiqueta");
 ### Ejemplo completo
 
 ~~~js
-// Crear un párrafo
-const parrafo = document.createElement("p");
-parrafo.textContent = "Hola desde JS!";
+const card = document.createElement("div");
+card.className = "card";
+card.textContent = "Nueva card";
 
-// Agregarlo al body
-document.body.appendChild(parrafo);
+const container = document.querySelector("#cards");
+container.appendChild(card);
 ~~~
 
 ### appendChild vs append
 
-- \`appendChild\`: agrega un solo nodo, devuelve el nodo
-- \`append\`: permite múltiples nodos y texto, no devuelve nada
-
-### Crear estructura completa
-
-~~~js
-const card = document.createElement("div");
-card.className = "card";
-
-const title = document.createElement("h2");
-title.textContent = "Mi Card";
-card.appendChild(title);
-~~~
+- \`appendChild\`: agrega un solo nodo, lo devuelve
+- \`append\`: permite varios nodos y texto, no devuelve nada
 `,
-  snippet: `// Crea un elemento <li>
-const item = ███;
+  snippet: `// Crea una card con contenido dinámico
+const container = document.querySelector("#cards");
 
-item.textContent = "Nuevo elemento";
-document.querySelector("ul").appendChild(item);`,
-  answer: `document.createElement("li")`,
-  hint: 'Usa document.createElement con la etiqueta "li"',
-  preview: '<li>Nuevo elemento</li>',
+for (let i = 0; i < 3; i++) {
+  // Tu turno: crea un div, asígnale clase y texto
+  █████████████████████████████████████████████████████████████████████████████████████████
+  
+  container.appendChild(card);
+}`,
+  answer: `const card = document.createElement("div");
+card.className = "card";
+card.textContent = "Card " + (i + 1)`,
+  hint: 'Crea el div, asigna clase y texto',
+  preview: '<div class="card">Card 1</div>',
   difficulty: 'medium',
+  intro: 'Aprenderás a **crear elementos HTML desde cero** con createElement. Los creas en memoria, los configuras y luego los agregas al DOM.',
 }

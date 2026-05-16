@@ -1,10 +1,10 @@
 export default {
   id: '04-classList',
-  title: 'Manipulando clases CSS con classList',
+  title: 'Manipulando clases CSS',
   module: 'DOM Manipulation',
   theory: `## classList
 
-\`classList\` es una propiedad que devuelve los métodos para **añadir, quitar y verificar clases CSS** de un elemento.
+\`classList\` te permite **añadir, quitar y verificar clases CSS**.
 
 ### Métodos principales
 
@@ -15,26 +15,35 @@ export default {
 | \`toggle("clase")\` | Si existe la quita, si no la añade |
 | \`contains("clase")\` | Devuelve true/false |
 
-### Ejemplos
+### Ejemplo
 
 ~~~js
-const elemento = document.querySelector(".mi-elemento");
-
-elemento.classList.add("activo");
+elemento.classList.add("visible", "animado");
 elemento.classList.remove("oculto");
-elemento.classList.toggle("dark-mode");
 
 if (elemento.classList.contains("activo")) {
   console.log("Está activo!");
 }
 ~~~
 `,
-  snippet: `const modal = document.querySelector(".modal");
+  snippet: `// Maneja la apertura de un modal
+const modal = document.querySelector(".modal");
+const btn = document.querySelector("#abrir-modal");
+const closeBtn = document.querySelector("#cerrar-modal");
 
-// Añade la clase "visible" al modal
-████████████████████;`,
-  answer: `modal.classList.add("visible")`,
-  hint: 'Usa classList.add("visible")',
+btn.addEventListener("click", () => {
+  // Tu turno: agrega "visible" y quita "oculto"
+  ███████████████████████████████████████████████████████
+});
+
+closeBtn.addEventListener("click", () => {
+  modal.classList.remove("visible");
+  modal.classList.add("oculto");
+});`,
+  answer: `modal.classList.add("visible");
+modal.classList.remove("oculto")`,
+  hint: 'Usa classList.add() y classList.remove()',
   preview: '<div class="modal visible">...</div>',
-  difficulty: 'easy',
+  difficulty: 'medium',
+  intro: 'Vas a aprender a **controlar clases CSS** desde JavaScript usando classList. Es la forma moderna de mostrar/ocultar elementos y manejar estilos dinámicamente.',
 }

@@ -50,7 +50,7 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
         tabindex="0"
         class="flex-1 min-h-0 p-4 bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff]/30 outline-none cursor-text transition-all overflow-y-auto"
       >
-        <div id="chars-container" class="font-mono text-lg leading-relaxed">
+        <div id="chars-container" class="font-mono text-lg leading-relaxed whitespace-pre-wrap">
           ${renderChars(engine.getCharsState())}
         </div>
         <div id="ghost" class="font-mono text-lg leading-relaxed text-[#2a2a3e] ${engine.currentIndex > 0 ? 'hidden' : ''}">
@@ -139,6 +139,27 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
       e.preventDefault()
       engine.type(null)
       updateUI()
+      return
+    }
+
+    // Enter key for multi-line answers
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const result = engine.type('\n')
+
+      if (result.correct === false) {
+        typingArea.classList.remove('shake')
+        void typingArea.offsetWidth
+        typingArea.classList.add('shake')
+      }
+
+      updateUI()
+
+      if (result.complete) {
+        isComplete = true
+        showCompletion()
+        if (onComplete) onComplete(engine)
+      }
       return
     }
 

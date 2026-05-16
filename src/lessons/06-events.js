@@ -1,10 +1,10 @@
 export default {
   id: '06-events',
-  title: 'Escuchando eventos con addEventListener',
+  title: 'Escuchando eventos del DOM',
   module: 'DOM Manipulation',
   theory: `## addEventListener
 
-El método \`addEventListener\` te permite **escuchar eventos** en elementos del DOM y ejecutar código cuando ocurren.
+Te permite **escuchar eventos** en elementos del DOM.
 
 ### Sintaxis
 
@@ -16,38 +16,45 @@ elemento.addEventListener("evento", callback);
 
 | Evento | Descripción |
 |--------|-------------|
-| \`"click"\` | Cuando se hace clic |
-| \`"mouseover"\` | Mouse entra al elemento |
+| \`"click"\` | Clic del mouse |
+| \`"submit"\` | Envío de formulario |
 | \`"keydown"\` | Tecla presionada |
-| \`"submit"\` | Formulario enviado |
-| \`"load"\` | Página cargada |
+| \`"mouseover"\` | Mouse entra al elemento |
+| \`"input"\` | Cambio en input |
 
-### Ejemplo
-
-~~~js
-const boton = document.querySelector("button");
-
-boton.addEventListener("click", function() {
-  alert("Me hiciste clic!");
-});
-~~~
-
-### Arrow functions
-
-Puedes usar arrow functions para más claridad:
+### Ejemplo completo
 
 ~~~js
-boton.addEventListener("click", () => {
-  console.log("Clickeado!");
+const form = document.querySelector("#form");
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = new FormData(form);
+  console.log(Object.fromEntries(data));
 });
 ~~~
 `,
-  snippet: `const boton = document.querySelector("#btn");
+  snippet: `// Valida un formulario antes de enviarlo
+const form = document.querySelector("#login-form");
+const email = document.querySelector("#email");
+const pass = document.querySelector("#password");
 
-// Agrega un evento click que muestre "Clickeado!" en consola
-███████████████████████████████████████████████;`,
-  answer: `boton.addEventListener("click", () => { console.log("Clickeado!"); })`,
-  hint: 'Usa addEventListener("click", callback)',
-  preview: 'click → "Clickeado!" en console',
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  // Tu turno: valida que los campos no estén vacíos
+  ███████████████████████████████████████████████████████████████████████████████████████
+  
+  if (!email.value || !pass.value) {
+    alert("Completa todos los campos");
+  } else {
+    alert("Formulario válido!");
+  }
+});`,
+  answer: `const emailVal = email.value.trim();
+const passVal = pass.value.trim()`,
+  hint: 'Obtén los valores con .value y .trim()',
+  preview: 'Valida que email y password tengan contenido',
   difficulty: 'medium',
+  intro: 'Aprenderás a **escuchar eventos del DOM** con addEventListener. Desde clics hasta formularios, los eventos son el corazón de la interactividad en la web.',
 }

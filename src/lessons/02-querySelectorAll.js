@@ -1,10 +1,10 @@
 export default {
   id: '02-querySelectorAll',
-  title: 'Seleccionando múltiples elementos con querySelectorAll',
+  title: 'Múltiples elementos con querySelectorAll',
   module: 'DOM Manipulation',
   theory: `## querySelectorAll
 
-Mientras que \`querySelector\` devuelve **un solo elemento**, \`querySelectorAll\` devuelve **todos los elementos** que coincidan con el selector.
+\`querySelectorAll\` devuelve **todos los elementos** que coincidan con el selector, en forma de NodeList.
 
 ### Sintaxis
 
@@ -14,32 +14,38 @@ document.querySelectorAll(selector)
 
 ### ¿Qué devuelve?
 
-Devuelve una **NodeList** (similar a un array). Puedes iterarla con \`forEach\` o convertirla a array.
-
-### Ejemplos
+Una **NodeList** (similar a un array). Puedes iterarla con \`forEach\`:
 
 ~~~js
-// Todos los elementos con clase "item"
 const items = document.querySelectorAll(".item");
-
-// Todos los <li> dentro de un <ul>
-const listItems = document.querySelectorAll("ul > li");
-
-// Todos los inputs de tipo texto
-const textInputs = document.querySelectorAll('input[type="text"]');
+items.forEach(item => {
+  item.classList.add("activo");
+});
 ~~~
 
-### Diferencia clave
+### Diferencia clave con querySelector
 
 | Método | Devuelve | Si no encuentra |
 |--------|----------|----------------|
 | querySelector | Un elemento (Node) | null |
-| querySelectorAll | NodeList (vacía) | NodeList vacía |
+| querySelectorAll | NodeList | NodeList vacía |
 `,
-  snippet: `// Selecciona todos los elementos con clase "card"
-const cards = ███;`,
-  answer: `document.querySelectorAll(".card")`,
-  hint: 'Usa querySelectorAll con el selector ".card"',
+  snippet: `// Selecciona todos los items del menú
+// y a cada uno asígnale un data-index
+const menuItems = document.querySelectorAll(".menu-item");
+menuItems.forEach((item, i) => {
+  item.dataset.index = i;
+});
+
+// Tu turno: selecciona todos los .card
+███████████████████████████
+
+cards.forEach(card => {
+  card.style.display = "block";
+});`,
+  answer: `const cards = document.querySelectorAll(".card")`,
+  hint: 'Usa querySelectorAll(".card")',
   preview: 'Devuelve: NodeList(3) [div.card, div.card, div.card]',
   difficulty: 'easy',
+  intro: 'Ahora verás cómo seleccionar **múltiples elementos** a la vez con querySelectorAll. Perfecto para cuando necesitas trabajar con listas de elementos.',
 }
