@@ -1,13 +1,13 @@
 /**
  * Themes for CodeType
- * Each theme defines CSS custom properties applied to :root
+ * Each theme uses a distinct font and color palette
  */
 
 export const themes = {
   'codetype-dark': {
     name: 'CodeType Dark',
     icon: '🌙',
-    font: "'JetBrains Mono', monospace",
+    font: "'Source Code Pro', 'Fira Code', monospace",
     props: {
       '--bg': '#0a0a0f',
       '--surface': '#14141f',
