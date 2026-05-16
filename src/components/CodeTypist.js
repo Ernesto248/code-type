@@ -1,7 +1,7 @@
 import { LessonEngine } from '../lib/lessonEngine.js'
 
 /**
- * CodeTypist component — the core typing interface.
+ * CodeTypist — the typing interface.
  * Shows the answer code character by character with Monkeytype-style feedback.
  */
 export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
@@ -12,7 +12,7 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
 
   container.innerHTML = `
     <!-- Stats bar -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center justify-between mb-4 shrink-0">
       <div class="flex items-center gap-4 text-sm">
         <div class="flex items-center gap-1.5">
           <span class="text-[#7c7c8a]">⚡</span>
@@ -34,37 +34,39 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
       </button>
     </div>
 
-    <!-- Snippet preview (read-only, context) -->
-    <div class="mb-3 p-3 bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg">
-      <pre class="text-sm font-mono text-[#7c7c8a] whitespace-pre-wrap">${escapeHtml(lesson.snippet.replace('███', ''))}</pre>
+    <!-- Snippet context bar — compact, single phrase -->
+    <div class="mb-3 p-2.5 bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg shrink-0 overflow-hidden">
+      <div class="flex items-start gap-2">
+        <span class="text-[#6c63ff] text-xs font-mono mt-0.5 shrink-0">▸</span>
+        <code id="context-code" class="text-xs font-mono text-[#7c7c8a] leading-relaxed">Cargando contexto...</code>
+      </div>
     </div>
 
-    <!-- Typing target -->
-    <div class="flex-1 flex flex-col">
-      <div class="text-xs text-[#7c7c8a] mb-2 font-mono">// Escribe el código aquí ↓</div>
+    <!-- Typing area — flex-grows to fill space -->
+    <div class="flex-1 flex flex-col min-h-0">
+      <div class="text-xs text-[#7c7c8a] mb-2 font-mono shrink-0">// Escribe el código aquí:</div>
       <div 
         id="typing-area"
         tabindex="0"
-        class="relative flex-1 p-4 bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff]/30 outline-none cursor-text transition-all"
+        class="flex-1 min-h-0 p-4 bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff]/30 outline-none cursor-text transition-all overflow-y-auto"
       >
-        <div id="chars-container" class="font-mono text-lg leading-relaxed whitespace-pre-wrap break-all">
+        <div id="chars-container" class="font-mono text-lg leading-relaxed">
           ${renderChars(engine.getCharsState())}
         </div>
-        <!-- Ghost text for empty state -->
-        <div id="ghost" class="absolute inset-4 font-mono text-lg leading-relaxed text-[#2a2a3e] pointer-events-none ${engine.currentIndex > 0 ? 'hidden' : ''}">
+        <div id="ghost" class="font-mono text-lg leading-relaxed text-[#2a2a3e] ${engine.currentIndex > 0 ? 'hidden' : ''}">
           Empieza a escribir...
         </div>
       </div>
 
       <!-- Progress bar -->
-      <div class="mt-3 h-1 bg-[#1c1c2e] rounded-full overflow-hidden">
+      <div class="mt-3 h-1 bg-[#1c1c2e] rounded-full overflow-hidden shrink-0">
         <div id="progress-bar" class="h-full bg-gradient-to-r from-[#6c63ff] to-[#4ade80] rounded-full progress-fill" style="width: 0%"></div>
       </div>
     </div>
 
-    <!-- Completion overlay (hidden initially) -->
-    <div id="completion-overlay" class="hidden absolute inset-0 bg-[#0a0a0f]/90 backdrop-blur-sm flex items-center justify-center rounded-lg z-10">
-      <div class="text-center complete-glow p-8 rounded-2xl border border-[#4ade80]/20">
+    <!-- Completion overlay -->
+    <div id="completion-overlay" class="hidden absolute inset-0 bg-[#0a0a0f]/90 backdrop-blur-sm flex items-center justify-center rounded-xl z-10">
+      <div class="text-center complete-glow p-8 rounded-2xl border border-[#4ade80]/20 bg-[#14141f]">
         <div class="text-5xl mb-4">🎉</div>
         <h2 class="text-2xl font-bold text-white mb-2">¡Completado!</h2>
         <div class="flex items-center justify-center gap-6 text-sm font-mono">
@@ -87,9 +89,10 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
     </div>
   `
 
-  // ─── Setup typing interaction ───
+  // ─── Setup ───
 
   const charsContainer = container.querySelector('#chars-container')
+  const contextCode = container.querySelector('#context-code')
   const wpmDisplay = container.querySelector('#wpm-display')
   const accuracyDisplay = container.querySelector('#accuracy-display')
   const progressDisplay = container.querySelector('#progress-display')
@@ -103,40 +106,35 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
   const finalTime = container.querySelector('#final-time')
   const nextBtn = container.querySelector('#next-lesson-btn')
 
-  let isFocused = false
-  let inputBuffer = ''
   let isComplete = false
+
+  // Show context: tell the user what to type in a compact way
+  contextCode.textContent = lesson.snippet.replace('███', '...')
 
   function renderChars(charsState) {
     return charsState.map(({ char, state }) => {
-      const stateClass = state === 'current' ? 'typing-char current' :
-                          state === 'correct' ? 'typing-char correct' :
-                          state === 'incorrect' ? 'typing-char incorrect shake' : 'typing-char pending'
-      const displayChar = char === ' ' ? ' ' : char
-      return `<span class="${stateClass}">${escapeHtml(displayChar)}</span>`
+      const cls = state === 'current' ? 'typing-char current' :
+                  state === 'correct' ? 'typing-char correct' :
+                  state === 'incorrect' ? 'typing-char incorrect shake' : 'typing-char pending'
+      const display = char === ' ' ? '\u00A0' : char // non-breaking space for visibility
+      return `<span class="${cls}">${escapeHtml(display)}</span>`
     }).join('')
   }
 
   function updateUI() {
-    const state = engine.getCharsState()
-    charsContainer.innerHTML = renderChars(state)
-
+    charsContainer.innerHTML = renderChars(engine.getCharsState())
     ghost.classList.toggle('hidden', engine.currentIndex > 0)
-
     wpmDisplay.textContent = engine.wpm
     accuracyDisplay.textContent = engine.accuracy
     progressDisplay.textContent = `${engine.currentIndex}/${engine.chars.length}`
-
     const pct = engine.chars.length > 0 ? (engine.currentIndex / engine.chars.length) * 100 : 0
-    progressBar.style.width = `${pct}%`
-
+    progressBar.style.width = `${Math.min(pct, 100)}%`
     if (onProgress) onProgress(engine)
   }
 
   function handleKeydown(e) {
     if (isComplete) return
 
-    // Only handle printable keys + backspace
     if (e.key === 'Backspace') {
       e.preventDefault()
       engine.type(null)
@@ -147,11 +145,11 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
     if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
       e.preventDefault()
       const result = engine.type(e.key)
-      
+
       if (result.correct === false) {
-        // Shake on wrong char
+        typingArea.classList.remove('shake')
+        void typingArea.offsetWidth
         typingArea.classList.add('shake')
-        setTimeout(() => typingArea.classList.remove('shake'), 300)
       }
 
       updateUI()
@@ -170,38 +168,30 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
     finalWpm.textContent = engine.wpm
     finalAccuracy.textContent = engine.accuracy
     finalTime.textContent = `${Math.round(engine.elapsed)}s`
-    typingArea.classList.add('complete-glow')
   }
 
   function resetLesson() {
     engine.reset()
     isComplete = false
     completionOverlay.classList.add('hidden')
-    typingArea.classList.remove('complete-glow')
     updateUI()
     typingArea.focus()
   }
 
-  // ─── Event listeners ───
+  // ─── Events ───
 
-  typingArea.addEventListener('focus', () => { isFocused = true })
-  typingArea.addEventListener('blur', () => { isFocused = false })
   typingArea.addEventListener('keydown', handleKeydown)
   typingArea.addEventListener('click', () => typingArea.focus())
 
   resetBtn.addEventListener('click', resetLesson)
 
-  if (nextBtn && onComplete) {
+  if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      // Dispatch on the container so parent catches it
       container.dispatchEvent(new CustomEvent('next-lesson', { bubbles: true }))
     })
   }
 
-  // Initial render
   updateUI()
-
-  // Focus on mount
   setTimeout(() => typingArea.focus(), 100)
 
   return container

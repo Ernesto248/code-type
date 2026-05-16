@@ -25,9 +25,10 @@
 ::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #3a3a4e; }
 
-/* Typing area */
+/* Typing chars — always inline, no wrapping between chars */
 .typing-char {
-  @apply transition-colors duration-75;
+  display: inline;
+  transition: color 75ms ease, border-color 75ms ease;
 }
 .typing-char.pending {
   color: #4a4a5e;
@@ -41,11 +42,12 @@
   text-decoration-color: #f87171;
 }
 .typing-char.current {
-  animation: blink-caret 1s step-end infinite;
   border-left: 2px solid #6c63ff;
+  animation: blink-caret 1s step-end infinite;
 }
 
 @keyframes blink-caret {
+  0%, 100% { border-color: #6c63ff; }
   50% { border-color: transparent; }
 }
 
@@ -77,12 +79,12 @@
   animation: shake 0.3s ease-in-out;
 }
 
-/* Floating particles background */
+/* Floating particles */
 .floating-particle {
   position: fixed;
   border-radius: 50%;
   pointer-events: none;
-  opacity: 0.15;
+  opacity: 0.12;
   animation: float linear infinite;
 }
 @keyframes float {
@@ -90,7 +92,12 @@
   to { transform: translateY(-100px) rotate(720deg); }
 }
 
-/* Smooth progress bar */
+/* Progress bar */
 .progress-fill {
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ghost text */
+.ghost-text {
+  color: #2a2a3e;
 }
