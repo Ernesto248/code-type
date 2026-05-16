@@ -11,13 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.1.2",
-      "onFail": "download"
-    }
-  },
+  "packageManager": "pnpm@11.1.2",
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "monaco-editor": "^0.55.1",
