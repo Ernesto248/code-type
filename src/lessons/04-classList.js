@@ -20,30 +20,27 @@ export default {
 ~~~js
 elemento.classList.add("visible", "animado");
 elemento.classList.remove("oculto");
-
 if (elemento.classList.contains("activo")) {
-  console.log("Está activo!");
+  console.log("Activo!");
 }
 ~~~
 `,
-  snippet: `// Maneja la apertura de un modal
-const modal = document.querySelector(".modal");
-const btn = document.querySelector("#abrir-modal");
-const closeBtn = document.querySelector("#cerrar-modal");
+  code: `const modal = document.querySelector(".modal");
+const overlay = document.querySelector(".overlay");
+const closeBtn = document.querySelector(".close-btn");
 
-btn.addEventListener("click", () => {
-  // Tu turno: agrega "visible" y quita "oculto"
-  ███████████████████████████████████████████████████████
-});
+function openModal() {
+  modal.classList.add("visible");
+  modal.classList.remove("hidden");
+  overlay.classList.remove("hidden");
+}
 
-closeBtn.addEventListener("click", () => {
+closeBtn.addEventListener("click", function () {
   modal.classList.remove("visible");
-  modal.classList.add("oculto");
+  modal.classList.add("hidden");
+  overlay.classList.add("hidden");
 });`,
-  answer: `modal.classList.add("visible");
-modal.classList.remove("oculto")`,
-  hint: 'Usa classList.add() y classList.remove()',
-  preview: '<div class="modal visible">...</div>',
+  hint: 'classList.add, .remove y .toggle son los métodos clave',
   difficulty: 'medium',
-  intro: 'Vas a aprender a **controlar clases CSS** desde JavaScript usando classList. Es la forma moderna de mostrar/ocultar elementos y manejar estilos dinámicamente.',
+  intro: 'Aprenderás a **controlar clases CSS dinámicamente** con classList. Esencial para mostrar/ocultar elementos y manejar estados visuales.',
 }

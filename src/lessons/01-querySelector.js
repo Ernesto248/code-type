@@ -17,7 +17,6 @@ document.querySelector(selector)
 - \`#header\` → elemento con id "header"
 - \`.nav-item\` → primer elemento con clase "nav-item"
 - \`div\` → primer elemento <div>
-- \`[data-type="card"]\` → primer elemento con ese atributo
 
 ### Tips
 
@@ -25,18 +24,14 @@ document.querySelector(selector)
 - Si no encuentra nada, devuelve \`null\`
 - Es más lento que \`getElementById\` para IDs, pero más legible
 `,
-  snippet: `// Selecciona el header y cambia su texto
-const header = document.querySelector("header h1");
-header.textContent = "Bienvenido!";
+  code: `const header = document.querySelector("header");
+const title = document.querySelector("#title");
+const firstLink = document.querySelector("nav a");
+const sidebar = document.querySelector(".sidebar");
 
-// Tu turno: selecciona #app
-███████████████████████
-
-const title = document.querySelector("#app h1");
-console.log(title.textContent);`,
-  answer: `const app = document.querySelector("#app")`,
-  hint: 'Usa querySelector("#app")',
-  preview: 'Selecciona el elemento con id "app"',
+title.textContent = "Hola DOM!";
+sidebar.classList.add("activo");`,
+  hint: 'querySelector acepta cualquier selector CSS',
   difficulty: 'easy',
-  intro: 'Vas a aprender a seleccionar elementos del DOM usando **querySelector**. Es el método más versátil para encontrar elementos en la página usando selectores CSS.',
+  intro: 'En este nivel escribirás tu primer código DOM: seleccionar elementos con **querySelector** y manipularlos.',
 }

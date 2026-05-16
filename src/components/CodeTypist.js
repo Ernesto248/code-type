@@ -5,7 +5,7 @@ import { LessonEngine } from '../lib/lessonEngine.js'
  * Shows the answer code character by character with Monkeytype-style feedback.
  */
 export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
-  const engine = new LessonEngine(lesson.answer)
+  const engine = new LessonEngine(lesson.code)
 
   const container = document.createElement('div')
   container.className = 'h-full flex flex-col slide-in'
@@ -32,7 +32,6 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
       <button id="reset-typing" class="text-xs text-[#7c7c8a] hover:text-[#f87171] transition-colors cursor-pointer">
         ↻ Reiniciar
       </button>
-    </div>
 
     </div>
 

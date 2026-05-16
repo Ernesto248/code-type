@@ -20,27 +20,27 @@ elemento.textContent = "Nuevo contenido";
 
 ### textContent vs innerText
 
-- **textContent**: devuelve **todo** el texto (incluye oculto). Más rápido.
+- **textContent**: todo el texto, incluye oculto. Más rápido.
 - **innerText**: solo texto visible. Más lento.
 
 ### Template strings
-
-Puedes interpolar valores con template literals:
 
 ~~~js
 elemento.textContent = \`Total: \${count} elementos\`;
 ~~~
 `,
-  snippet: `// Cuenta los items y muestra el resultado
-const lista = document.querySelector("#lista");
-const items = lista.querySelectorAll("li");
+  code: `const output = document.querySelector("#output");
+const counter = document.querySelector("#counter");
+const items = document.querySelectorAll("li");
 const total = items.length;
 
-// Tu turno: actualiza el texto del contador
-████████████████████████████████████████████████████████████████████████`,
-  answer: `document.querySelector("#contador").textContent = \`Total: \${total} elementos\``,
-  hint: 'Usa template string con textContent',
-  preview: '<span id="contador">Total: 5 elementos</span>',
+output.textContent = "Lista cargada";
+counter.textContent = "Items: " + total;
+
+if (total > 0) {
+  console.log("Hay elementos en la lista");
+}`,
+  hint: 'Usa textContent para leer y asignar texto',
   difficulty: 'medium',
-  intro: 'Aprenderás a **leer y modificar texto** en el DOM con textContent. También verás cómo usar **template strings** para interpolar valores dinámicamente.',
+  intro: 'Vas a practicar **leyendo y escribiendo texto** en el DOM con textContent y template strings.',
 }
