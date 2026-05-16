@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+
+  --color-bg: #0a0a0f;
+  --color-surface: #14141f;
+  --color-surface-2: #1c1c2e;
+  --color-border: #2a2a3e;
+  --color-text: #e1e1e6;
+  --color-text-dim: #7c7c8a;
+  --color-accent: #6c63ff;
+  --color-accent-glow: #6c63ff40;
+  --color-success: #4ade80;
+  --color-error: #f87171;
+  --color-correct: #4ade80;
+  --color-incorrect: #f87171;
+  --color-current: #e1e1e6;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a4e; }
+
+/* Typing area */
+.typing-char {
+  @apply transition-colors duration-75;
+}
+.typing-char.pending {
+  color: #4a4a5e;
+}
+.typing-char.correct {
+  color: #4ade80;
+}
+.typing-char.incorrect {
+  color: #f87171;
+  text-decoration: underline;
+  text-decoration-color: #f87171;
+}
+.typing-char.current {
+  animation: blink-caret 1s step-end infinite;
+  border-left: 2px solid #6c63ff;
+}
+
+@keyframes blink-caret {
+  50% { border-color: transparent; }
+}
+
+/* Completion animation */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(108, 99, 255, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(108, 99, 255, 0.4); }
+}
+.complete-glow {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* Slide in */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Shake on error */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+.shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Floating particles background */
+.floating-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.15;
+  animation: float linear infinite;
+}
+@keyframes float {
+  from { transform: translateY(100vh) rotate(0deg); }
+  to { transform: translateY(-100px) rotate(720deg); }
+}
+
+/* Smooth progress bar */
+.progress-fill {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,27 @@
+{
+  "name": "codetype",
+  "version": "1.0.0",
+  "description": "CodeTypist - Learn JS/TS by typing, like Monkeytype for code",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.1.2",
+      "onFail": "download"
+    }
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "monaco-editor": "^0.55.1",
+    "tailwindcss": "^4.3.0",
+    "vite": "^8.0.13"
+  }
+}
