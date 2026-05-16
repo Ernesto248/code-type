@@ -1,66 +1,103 @@
 @import "tailwindcss";
 
+/* ─── Default CSS variable values (used before JS theme loads) ─── */
+:root {
+  --bg: #0a0a0f;
+  --surface: #14141f;
+  --surface-2: #1c1c2e;
+  --border: #2a2a3e;
+  --text: #e1e1e6;
+  --text-dim: #7c7c8a;
+  --accent: #6c63ff;
+  --accent-glow: #6c63ff40;
+  --success: #4ade80;
+  --error: #f87171;
+  --caret-color: #6c63ff;
+  --pending-char: #4a4a5e;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
 @theme {
   --font-mono: 'JetBrains Mono', monospace;
   --font-sans: 'Inter', sans-serif;
-
-  --color-bg: #0a0a0f;
-  --color-surface: #14141f;
-  --color-surface-2: #1c1c2e;
-  --color-border: #2a2a3e;
-  --color-text: #e1e1e6;
-  --color-text-dim: #7c7c8a;
-  --color-accent: #6c63ff;
-  --color-accent-glow: #6c63ff40;
-  --color-success: #4ade80;
-  --color-error: #f87171;
-  --color-correct: #4ade80;
-  --color-incorrect: #f87171;
-  --color-current: #e1e1e6;
 }
 
-/* Scrollbar styling */
+/* ─── Base styles ─── */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a4e; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--border), var(--text) 20%); }
 
-/* Typing chars — always inline, no wrapping between chars */
+/* ─── Typing chars ─── */
+
 .typing-char {
   display: inline;
-  transition: color 75ms ease, border-color 75ms ease;
+  transition: color 75ms ease, border-color 75ms ease, transform 75ms ease;
 }
 .typing-char.pending {
-  color: #4a4a5e;
+  color: var(--pending-char);
 }
 .typing-char.correct {
-  color: #4ade80;
+  color: var(--success);
+  animation: char-pop 0.15s ease-out;
 }
 .typing-char.incorrect {
-  color: #f87171;
+  color: var(--error);
   text-decoration: underline;
-  text-decoration-color: #f87171;
+  text-decoration-color: var(--error);
+  animation: char-shake 0.25s ease-in-out;
 }
 .typing-char.current {
-  border-left: 2px solid #6c63ff;
+  border-left: 2px solid var(--caret-color);
   animation: blink-caret 1s step-end infinite;
 }
 
+@keyframes char-pop {
+  0% { transform: scale(1.15); opacity: 0.7; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes char-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
 @keyframes blink-caret {
-  0%, 100% { border-color: #6c63ff; }
+  0%, 100% { border-color: var(--caret-color); }
   50% { border-color: transparent; }
 }
 
-/* Completion animation */
+/* ─── Typing area glow on focus ─── */
+
+#typing-area:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px var(--accent-glow);
+}
+
+/* ─── Completion ─── */
+
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(108, 99, 255, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(108, 99, 255, 0.4); }
+  0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+  50% { box-shadow: 0 0 50px var(--accent-glow), 0 0 80px color-mix(in srgb, var(--accent) 20%, transparent); }
 }
 .complete-glow {
   animation: pulse-glow 1.5s ease-in-out infinite;
 }
 
-/* Slide in */
+/* ─── Slide in ─── */
+
 @keyframes slide-in {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -69,7 +106,8 @@
   animation: slide-in 0.3s ease-out;
 }
 
-/* Shake on error */
+/* ─── Shake (legacy, used by typing area) ─── */
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-4px); }
@@ -79,7 +117,8 @@
   animation: shake 0.3s ease-in-out;
 }
 
-/* Floating particles */
+/* ─── Floating particles ─── */
+
 .floating-particle {
   position: fixed;
   border-radius: 50%;
@@ -92,12 +131,77 @@
   to { transform: translateY(-100px) rotate(720deg); }
 }
 
-/* Progress bar */
+/* ─── Progress bar ─── */
+
 .progress-fill {
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Ghost text */
-.ghost-text {
-  color: #2a2a3e;
+/* ─── Ghost text ─── */
+
+#ghost {
+  color: var(--pending-char);
+}
+
+/* ─── Theme-specific styles ─── */
+
+/* Hacker Terminal: scanlines overlay */
+.theme-hacker-terminal #typing-area::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 65, 0.03) 2px,
+    rgba(0, 255, 65, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.theme-hacker-terminal .theory-content code {
+  color: var(--accent) !important;
+}
+
+.theme-hacker-terminal #typing-area {
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+
+/* JetBrains: softer shadows, blue glow */
+.theme-jetbrains #typing-area:focus {
+  box-shadow: 0 0 20px var(--accent-glow), inset 0 0 15px var(--accent-glow);
+}
+
+.theme-jetbrains .typing-char.correct {
+  text-shadow: 0 0 4px rgba(166, 227, 161, 0.3);
+}
+
+/* ─── Theme toggle button ─── */
+
+.theme-btn {
+  transition: all 0.2s ease;
+}
+.theme-btn:hover {
+  transform: scale(1.1);
+}
+.theme-btn.active {
+  border-color: var(--accent) !important;
+  background: var(--accent-glow) !important;
+}
+
+/* ─── Audio toggle ─── */
+
+.audio-toggle {
+  transition: all 0.2s ease;
+}
+.audio-toggle.muted {
+  opacity: 0.4;
+}
+
+/* ─── Button styles ─── */
+
+button {
+  font-family: var(--font-mono), monospace;
 }

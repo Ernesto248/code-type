@@ -3,6 +3,8 @@ import { TheoryPanel } from './TheoryPanel.js'
 import { CodeTypist } from './CodeTypist.js'
 import { LessonIntro } from './LessonIntro.js'
 import { markLessonComplete, getCompletedCount, loadProgress } from '../stores/progress.js'
+import { themes, initTheme, applyTheme, getSavedTheme } from '../themes.js'
+import { toggleAudio, isAudioEnabled, setAudioEnabled } from '../sound.js'
 
 export function App() {
   const app = document.querySelector('#app')
@@ -11,24 +13,50 @@ export function App() {
 
   let currentLessonIndex = 0
   let theoryExpanded = true
+  let currentTheme = getSavedTheme()
+
+  // Init theme
+  initTheme()
+
+  const themeKeys = Object.keys(themes)
 
   const html = `
     <!-- Floating particles -->
     <div id="particles" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-    <!-- Nav — always visible -->
-    <nav class="relative z-10 shrink-0 border-b border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md">
+    <!-- Nav -->
+    <nav class="relative z-10 shrink-0 border-b border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md" style="border-color: var(--border); background: color-mix(in srgb, var(--bg) 80%, transparent);">
       <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="text-2xl">⌨️</span>
-          <span class="font-bold text-lg tracking-tight">Code<span class="text-[#6c63ff]">Type</span></span>
+          <span class="font-bold text-lg tracking-tight">Code<span class="text-[#6c63ff]" style="color: var(--accent) !important;">Type</span></span>
         </div>
-        <div class="flex items-center gap-4 text-sm">
-          <span class="text-[#7c7c8a]">
-            Progreso: <span id="progress-count" class="text-white font-semibold">${getCompletedCount()}/${lessons.length}</span>
+
+        <div class="flex items-center gap-3 text-sm">
+          <!-- Audio toggle -->
+          <button id="audio-toggle" class="audio-toggle text-[var(--text-dim)] hover:text-[var(--text)] transition-colors cursor-pointer text-base px-1.5" title="Toggle sound">
+            ${isAudioEnabled() ? '🔊' : '🔇'}
+          </button>
+
+          <!-- Theme switcher -->
+          <div class="flex items-center gap-1 bg-[var(--surface)] border border-[var(--border)] rounded-lg p-0.5">
+            ${themeKeys.map((key, i) => `
+              <button class="theme-btn px-2 py-1.5 text-xs font-mono rounded-md transition-all cursor-pointer whitespace-nowrap
+                ${key === currentTheme ? 'active text-[var(--accent)]' : 'text-[var(--text-dim)] hover:text-[var(--text)]'}"
+                data-theme="${key}"
+                title="${themes[key].name}"
+              >
+                ${themes[key].icon} ${i === 1 ? 'Terminal' : i === 2 ? 'IDE' : 'Dark'}
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="h-4 w-px" style="background: var(--border);"></div>
+          <span class="text-[var(--text-dim)]">
+            Progreso: <span id="progress-count" class="text-[var(--text)] font-semibold">${getCompletedCount()}/${lessons.length}</span>
           </span>
-          <div class="h-4 w-px bg-[#2a2a3e]"></div>
-          <span id="module-badge" class="text-xs font-mono text-[#6c63ff] bg-[#6c63ff]/10 px-2.5 py-1 rounded-full border border-[#6c63ff]/20">
+          <div class="h-4 w-px" style="background: var(--border);"></div>
+          <span id="module-badge" class="text-xs font-mono px-2.5 py-1 rounded-full border" style="color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border-color: color-mix(in srgb, var(--accent) 20%, transparent);">
             DOM Manipulation
           </span>
         </div>
@@ -37,44 +65,39 @@ export function App() {
 
     <!-- Main content -->
     <main class="relative z-10 flex-1 flex max-w-7xl mx-auto w-full p-6 gap-0 min-h-0 overflow-hidden">
-
       <!-- Theory panel — collapsible sidebar -->
       <div class="relative flex items-stretch transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '45%' : '0px'}; min-width: ${theoryExpanded ? '280px' : '0px'};">
-        <section id="theory-panel" class="flex-1 min-w-0 overflow-y-auto bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in transition-all duration-300 ease-in-out ${theoryExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}">
+        <section id="theory-panel" class="flex-1 min-w-0 overflow-y-auto rounded-xl p-6 slide-in transition-all duration-300 ease-in-out ${theoryExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}" style="background: var(--surface); border: 1px solid var(--border);">
         </section>
 
-        <!-- Collapse toggle button -->
+        <!-- Collapse toggle -->
         <button id="theory-toggle"
-          class="absolute -right-3 top-6 z-20 w-6 h-10 flex items-center justify-center bg-[#14141f] border border-[#2a2a3e] rounded-r-lg hover:bg-[#1c1c2e] cursor-pointer transition-all duration-200 group"
-          style="border-left: none;"
+          class="absolute -right-3 top-6 z-20 w-6 h-10 flex items-center justify-center rounded-r-lg transition-all duration-200 group cursor-pointer"
+          style="background: var(--surface); border: 1px solid var(--border); border-left: none;"
         >
-          <span id="theory-chevron" class="text-[#7c7c8a] group-hover:text-[#6c63ff] transition-colors text-xs select-none">
+          <span id="theory-chevron" class="text-xs select-none" style="color: var(--text-dim);">
             ${theoryExpanded ? '◀' : '▶'}
           </span>
         </button>
       </div>
 
-      <!-- Gap between panels (collapse-aware) -->
+      <div class="shrink-0 transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '24px' : '0px'}"></div>
+      <div class="w-px shrink-0 transition-all duration-300 ease-in-out ${theoryExpanded ? 'opacity-100' : 'opacity-0'}" style="background: linear-gradient(to bottom, transparent, var(--border), transparent);"></div>
       <div class="shrink-0 transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '24px' : '0px'}"></div>
 
-      <!-- Divider -->
-      <div class="w-px shrink-0 transition-all duration-300 ease-in-out ${theoryExpanded ? 'opacity-100' : 'opacity-0'} bg-gradient-to-b from-transparent via-[#2a2a3e] to-transparent"></div>
-
-      <!-- Gap (other side) -->
-      <div class="shrink-0 transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '24px' : '0px'}"></div>
-
-      <!-- Code panel (right) — takes remaining space -->
-      <section id="code-panel" class="flex-1 min-w-0 relative bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in overflow-hidden transition-all duration-300 ease-in-out" style="animation-delay: 0.1s">
+      <!-- Code panel -->
+      <section id="code-panel" class="flex-1 min-w-0 relative rounded-xl p-6 slide-in overflow-hidden transition-all duration-300 ease-in-out" style="animation-delay: 0.1s; background: var(--surface); border: 1px solid var(--border);">
       </section>
     </main>
 
-    <!-- Lesson selector — always visible at bottom -->
-    <div id="lesson-selector" class="relative z-10 shrink-0 border-t border-[#2a2a3e] bg-[#0a0a0f]/80 backdrop-blur-md">
+    <!-- Lesson selector -->
+    <div id="lesson-selector" class="relative z-10 shrink-0 border-t" style="background: color-mix(in srgb, var(--bg) 80%, transparent); border-color: var(--border);">
       <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-2 overflow-x-auto">
         ${lessons.map((l, i) => `
           <button class="lesson-dot px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer whitespace-nowrap
-            ${i === currentLessonIndex ? 'bg-[#6c63ff]/20 border-[#6c63ff]/50 text-[#6c63ff]' : 'bg-transparent border-[#2a2a3e] text-[#7c7c8a] hover:border-[#4a4a5e] hover:text-white'}"
+            ${i === currentLessonIndex ? 'bg-[var(--accent)]/20 border-[var(--accent)]/50 text-[var(--accent)]' : 'bg-transparent border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text-dim)] hover:text-[var(--text)]'}"
             data-index="${i}"
+            style="border-color: ${i === currentLessonIndex ? 'color-mix(in srgb, var(--accent) 50%, transparent)' : 'var(--border)'}; ${i === currentLessonIndex ? `background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent)` : ''}"
           >
             ${i + 1}. ${l.title.split(' ').slice(0, 3).join(' ')}${l.title.split(' ').length > 3 ? '…' : ''}
           </button>
@@ -85,14 +108,39 @@ export function App() {
 
   app.innerHTML = html
 
-  // ─── Create particles ───
   createParticles()
+
+  // ─── Theme switcher ───
+
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.theme
+      applyTheme(theme)
+      currentTheme = theme
+
+      document.querySelectorAll('.theme-btn').forEach(b => {
+        b.classList.remove('active')
+        b.style.color = 'var(--text-dim)'
+      })
+      btn.classList.add('active')
+      btn.style.color = 'var(--accent)'
+    })
+  })
+
+  // ─── Audio toggle ───
+
+  const audioBtn = document.querySelector('#audio-toggle')
+  if (audioBtn) {
+    audioBtn.addEventListener('click', () => {
+      const enabled = toggleAudio()
+      audioBtn.textContent = enabled ? '🔊' : '🔇'
+    })
+  }
 
   // ─── Theory panel toggle ───
 
   function toggleTheory() {
     theoryExpanded = !theoryExpanded
-
     const theoryWrap = document.querySelector('.relative.flex.items-stretch')
     const theoryPanel = document.querySelector('#theory-panel')
     const chevron = document.querySelector('#theory-chevron')
@@ -113,12 +161,7 @@ export function App() {
       }
     }
     if (chevron) chevron.textContent = theoryExpanded ? '◀' : '▶'
-    
-    // Toggle gaps
-    gaps.forEach(g => {
-      g.style.width = theoryExpanded ? '24px' : '0px'
-    })
-    
+    gaps.forEach(g => { g.style.width = theoryExpanded ? '24px' : '0px' })
     if (divider) {
       if (theoryExpanded) {
         divider.classList.remove('opacity-0')
@@ -130,8 +173,7 @@ export function App() {
     }
   }
 
-  const toggleBtn = document.querySelector('#theory-toggle')
-  if (toggleBtn) toggleBtn.addEventListener('click', toggleTheory)
+  document.querySelector('#theory-toggle')?.addEventListener('click', toggleTheory)
 
   // ─── Lesson loader ───
 
@@ -141,9 +183,9 @@ export function App() {
 
     document.querySelectorAll('.lesson-dot').forEach((dot, i) => {
       if (i === index) {
-        dot.className = 'lesson-dot px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer whitespace-nowrap bg-[#6c63ff]/20 border-[#6c63ff]/50 text-[#6c63ff]'
+        dot.style.cssText = `background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 50%, transparent); color: var(--accent);`
       } else {
-        dot.className = 'lesson-dot px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer whitespace-nowrap bg-transparent border-[#2a2a3e] text-[#7c7c8a] hover:border-[#4a4a5e] hover:text-white'
+        dot.style.cssText = `background: transparent; border-color: var(--border); color: var(--text-dim);`
       }
     })
 
@@ -214,7 +256,7 @@ function createParticles() {
   if (!container) return
 
   const colors = ['#6c63ff', '#4ade80', '#f87171', '#60a5fa', '#fbbf24']
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 20; i++) {
     const p = document.createElement('div')
     const size = Math.random() * 4 + 2
     p.className = 'floating-particle'

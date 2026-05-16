@@ -1,4 +1,5 @@
 import { LessonEngine } from '../lib/lessonEngine.js'
+import { playKeypress, playComplete, playBackspace, isAudioEnabled } from '../sound.js'
 
 /**
  * CodeTypist — the typing interface.
@@ -128,6 +129,7 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
     if (e.key === 'Backspace') {
       e.preventDefault()
       engine.type(null)
+      if (isAudioEnabled()) playBackspace()
       updateUI()
       return
     }
@@ -142,6 +144,8 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
         void typingArea.offsetWidth
         typingArea.classList.add('shake')
       }
+
+      if (isAudioEnabled()) playKeypress(result.correct !== false)
 
       updateUI()
 
@@ -163,6 +167,8 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
         typingArea.classList.add('shake')
       }
 
+      if (isAudioEnabled()) playKeypress(result.correct !== false)
+
       updateUI()
 
       if (result.complete) {
@@ -179,6 +185,7 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
     finalWpm.textContent = engine.wpm
     finalAccuracy.textContent = engine.accuracy
     finalTime.textContent = `${Math.round(engine.elapsed)}s`
+    if (isAudioEnabled()) playComplete()
   }
 
   function resetLesson() {
