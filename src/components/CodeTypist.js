@@ -193,8 +193,8 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
 
   if (nextBtn && onComplete) {
     nextBtn.addEventListener('click', () => {
-      // The parent will handle navigation
-      completionOverlay.dispatchEvent(new CustomEvent('next-lesson'))
+      // Dispatch on the container so parent catches it
+      container.dispatchEvent(new CustomEvent('next-lesson', { bubbles: true }))
     })
   }
 
