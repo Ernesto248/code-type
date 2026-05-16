@@ -34,12 +34,6 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
       </button>
     </div>
 
-    <!-- Snippet context bar — compact, single phrase -->
-    <div class="mb-3 p-2.5 bg-[#0a0a0f] border border-[#2a2a3e] rounded-lg shrink-0 overflow-hidden">
-      <div class="flex items-start gap-2">
-        <span class="text-[#6c63ff] text-xs font-mono mt-0.5 shrink-0">▸</span>
-        <code id="context-code" class="text-xs font-mono text-[#7c7c8a] leading-relaxed">Cargando contexto...</code>
-      </div>
     </div>
 
     <!-- Typing area — flex-grows to fill space -->
@@ -92,7 +86,6 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
   // ─── Setup ───
 
   const charsContainer = container.querySelector('#chars-container')
-  const contextCode = container.querySelector('#context-code')
   const wpmDisplay = container.querySelector('#wpm-display')
   const accuracyDisplay = container.querySelector('#accuracy-display')
   const progressDisplay = container.querySelector('#progress-display')
@@ -108,8 +101,6 @@ export function CodeTypist(lesson, { onComplete, onProgress } = {}) {
 
   let isComplete = false
 
-  // Show context: tell the user what to type in a compact way
-  contextCode.textContent = lesson.snippet.replace('███', '...')
 
   function renderChars(charsState) {
     return charsState.map(({ char, state }) => {
