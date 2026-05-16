@@ -205,3 +205,88 @@ body {
 button {
   font-family: var(--font-mono), monospace;
 }
+
+/* ─── JetBrains IDE theme ─── */
+.theme-jetbrains {
+  font-variant-ligatures: normal;
+}
+
+.theme-jetbrains #typing-area {
+  font-size: 0.95rem;
+}
+
+.theme-jetbrains #typing-area:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 15px var(--accent-glow), inset 0 0 10px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.theme-jetbrains .typing-char.correct {
+  text-shadow: none;
+}
+
+.theme-jetbrains .typing-char.current {
+  border-left: 3px solid var(--caret-color);
+}
+
+/* IDE line height */
+.theme-jetbrains #chars-container {
+  line-height: 1.7;
+}
+
+/* ─── Hacker Terminal theme ─── */
+.theme-hacker-terminal #typing-area {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-hacker-terminal #typing-area::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 65, 0.025) 2px,
+    rgba(0, 255, 65, 0.025) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.theme-hacker-terminal #chars-container {
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.2), 0 0 30px rgba(0, 255, 65, 0.05);
+}
+
+.theme-hacker-terminal .typing-char.correct {
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.4), 0 0 40px rgba(0, 255, 65, 0.1);
+}
+
+.theme-hacker-terminal .typing-char.current {
+  border-left-color: #33ff33;
+  box-shadow: -2px 0 8px rgba(0, 255, 65, 0.2);
+}
+
+.theme-hacker-terminal .typing-char.pending {
+  text-shadow: 0 0 4px rgba(0, 255, 65, 0.05);
+}
+
+.theme-hacker-terminal .progress-fill {
+  background: linear-gradient(90deg, #1a7a1a, #33ff33) !important;
+}
+
+.theme-hacker-terminal nav,
+.theme-hacker-terminal #lesson-selector {
+  border-color: #1a3a1a !important;
+}
+
+.theme-hacker-terminal .theme-btn.active {
+  border-color: #33ff33 !important;
+  background: rgba(0, 255, 65, 0.1) !important;
+}
+
+/* Terminal-style font rendering */
+.theme-hacker-terminal {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
