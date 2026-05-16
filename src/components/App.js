@@ -10,6 +10,7 @@ export function App() {
   app.className = 'h-screen flex flex-col overflow-hidden'
 
   let currentLessonIndex = 0
+  let theoryExpanded = true
 
   const html = `
     <!-- Floating particles -->
@@ -34,17 +35,36 @@ export function App() {
       </div>
     </nav>
 
-    <!-- Main content — fills remaining space, both panels scroll independently -->
-    <main class="relative z-10 flex-1 flex max-w-7xl mx-auto w-full p-6 gap-6 min-h-0 overflow-hidden">
-      <!-- Theory panel (left) — scrolls independently -->
-      <section id="theory-panel" class="w-[45%] min-w-0 overflow-y-auto bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in">
-      </section>
+    <!-- Main content -->
+    <main class="relative z-10 flex-1 flex max-w-7xl mx-auto w-full p-6 gap-0 min-h-0 overflow-hidden">
 
-      <!-- Vertical divider -->
-      <div class="w-px shrink-0 bg-gradient-to-b from-transparent via-[#2a2a3e] to-transparent"></div>
+      <!-- Theory panel — collapsible sidebar -->
+      <div class="relative flex items-stretch transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '45%' : '0px'}; min-width: ${theoryExpanded ? '280px' : '0px'};">
+        <section id="theory-panel" class="flex-1 min-w-0 overflow-y-auto bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in transition-all duration-300 ease-in-out ${theoryExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}">
+        </section>
 
-      <!-- Code panel (right) — scrolls independently -->
-      <section id="code-panel" class="flex-1 min-w-0 relative bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in overflow-hidden" style="animation-delay: 0.1s">
+        <!-- Collapse toggle button -->
+        <button id="theory-toggle"
+          class="absolute -right-3 top-6 z-20 w-6 h-10 flex items-center justify-center bg-[#14141f] border border-[#2a2a3e] rounded-r-lg hover:bg-[#1c1c2e] cursor-pointer transition-all duration-200 group"
+          style="border-left: none;"
+        >
+          <span id="theory-chevron" class="text-[#7c7c8a] group-hover:text-[#6c63ff] transition-colors text-xs select-none">
+            ${theoryExpanded ? '◀' : '▶'}
+          </span>
+        </button>
+      </div>
+
+      <!-- Gap between panels (collapse-aware) -->
+      <div class="shrink-0 transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '24px' : '0px'}"></div>
+
+      <!-- Divider -->
+      <div class="w-px shrink-0 transition-all duration-300 ease-in-out ${theoryExpanded ? 'opacity-100' : 'opacity-0'} bg-gradient-to-b from-transparent via-[#2a2a3e] to-transparent"></div>
+
+      <!-- Gap (other side) -->
+      <div class="shrink-0 transition-all duration-300 ease-in-out" style="width: ${theoryExpanded ? '24px' : '0px'}"></div>
+
+      <!-- Code panel (right) — takes remaining space -->
+      <section id="code-panel" class="flex-1 min-w-0 relative bg-[#14141f] border border-[#2a2a3e] rounded-xl p-6 slide-in overflow-hidden transition-all duration-300 ease-in-out" style="animation-delay: 0.1s">
       </section>
     </main>
 
@@ -65,7 +85,53 @@ export function App() {
 
   app.innerHTML = html
 
+  // ─── Create particles ───
   createParticles()
+
+  // ─── Theory panel toggle ───
+
+  function toggleTheory() {
+    theoryExpanded = !theoryExpanded
+
+    const theoryWrap = document.querySelector('.relative.flex.items-stretch')
+    const theoryPanel = document.querySelector('#theory-panel')
+    const chevron = document.querySelector('#theory-chevron')
+    const gaps = document.querySelectorAll('.shrink-0[style*="width"]')
+    const divider = document.querySelector('.w-px.shrink-0')
+
+    if (theoryWrap) {
+      theoryWrap.style.width = theoryExpanded ? '45%' : '0px'
+      theoryWrap.style.minWidth = theoryExpanded ? '280px' : '0px'
+    }
+    if (theoryPanel) {
+      if (theoryExpanded) {
+        theoryPanel.classList.remove('opacity-0', 'pointer-events-none')
+        theoryPanel.classList.add('opacity-100')
+      } else {
+        theoryPanel.classList.remove('opacity-100')
+        theoryPanel.classList.add('opacity-0', 'pointer-events-none')
+      }
+    }
+    if (chevron) chevron.textContent = theoryExpanded ? '◀' : '▶'
+    
+    // Toggle gaps
+    gaps.forEach(g => {
+      g.style.width = theoryExpanded ? '24px' : '0px'
+    })
+    
+    if (divider) {
+      if (theoryExpanded) {
+        divider.classList.remove('opacity-0')
+        divider.classList.add('opacity-100')
+      } else {
+        divider.classList.remove('opacity-100')
+        divider.classList.add('opacity-0')
+      }
+    }
+  }
+
+  const toggleBtn = document.querySelector('#theory-toggle')
+  if (toggleBtn) toggleBtn.addEventListener('click', toggleTheory)
 
   // ─── Lesson loader ───
 
@@ -73,7 +139,6 @@ export function App() {
     currentLessonIndex = index
     const lesson = lessons[index]
 
-    // Update dots
     document.querySelectorAll('.lesson-dot').forEach((dot, i) => {
       if (i === index) {
         dot.className = 'lesson-dot px-3 py-1.5 text-xs font-mono rounded-lg border transition-all cursor-pointer whitespace-nowrap bg-[#6c63ff]/20 border-[#6c63ff]/50 text-[#6c63ff]'
@@ -82,11 +147,9 @@ export function App() {
       }
     })
 
-    // Module badge
     const badge = document.querySelector('#module-badge')
     if (badge) badge.textContent = lesson.module
 
-    // Theory panel
     const theoryPanel = document.querySelector('#theory-panel')
     theoryPanel.innerHTML = ''
     theoryPanel.classList.remove('slide-in')
@@ -94,7 +157,6 @@ export function App() {
     theoryPanel.classList.add('slide-in')
     theoryPanel.appendChild(TheoryPanel(lesson))
 
-    // Code panel
     const codePanel = document.querySelector('#code-panel')
     codePanel.innerHTML = ''
     codePanel.classList.remove('slide-in')
@@ -124,8 +186,7 @@ export function App() {
   function goNext() {
     const next = getNextLesson(lessons[currentLessonIndex].id)
     if (next) {
-      const nextIdx = lessons.indexOf(next)
-      showLesson(nextIdx)
+      showLesson(lessons.indexOf(next))
     }
   }
 
@@ -143,7 +204,6 @@ export function App() {
     })
   })
 
-  // Start with lesson 0 intro
   showLesson(0)
 }
 
