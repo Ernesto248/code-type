@@ -1,9 +1,9 @@
-import lesson01 from './01-querySelector.js'
-import lesson02 from './02-querySelectorAll.js'
-import lesson03 from './03-textContent.js'
-import lesson04 from './04-classList.js'
-import lesson05 from './05-createElement.js'
-import lesson06 from './06-events.js'
+import lesson01 from './01-variables.js'
+import lesson02 from './02-strings.js'
+import lesson03 from './03-conditionals.js'
+import lesson04 from './04-loops.js'
+import lesson05 from './05-functions.js'
+import lesson06 from './06-arrays-basics.js'
 import lesson07 from './07-arrays-map.js'
 import lesson08 from './08-arrays-filter.js'
 import lesson09 from './09-arrays-reduce.js'
@@ -34,4 +34,8 @@ export function getNextLesson(currentId) {
 
 export function getLessonsByModule(module) {
   return lessons.filter(l => l.module === module)
+}
+
+export function getModules() {
+  return [...new Set(lessons.map(l => l.module))]
 }
